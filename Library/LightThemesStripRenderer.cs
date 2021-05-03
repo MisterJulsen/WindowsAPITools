@@ -29,16 +29,13 @@ namespace WinAPITools
         private Color panelBorder = Color.FromArgb(204, 204, 204);
         private Color panelInside = Color.FromArgb(242, 242, 242);
 
-        //private Color selButtonBorder = Color.FromArgb(204, 232, 255);
-        //private Color selButtonInside = Color.FromArgb(229, 243, 255);
+        private Color selButtonBorder = Color.FromArgb(100, 0, 140, 255);
+        private Color selButtonInside = Color.FromArgb(50, 0, 140, 255);
 
-        private Color selButtonBorder = Color.FromArgb(153, 209, 255);
-        private Color selButtonInside = Color.FromArgb(210, 230, 255);
+        private Color pressedButtonBorder = Color.FromArgb(100, 0, 140, 255);
+        private Color pressedButtonInside = Color.FromArgb(80, 0, 140, 255);
 
-        private Color pressedButtonBorder = Color.FromArgb(153, 209, 255);
-        private Color pressedButtonInside = Color.FromArgb(187, 219, 255);
-
-        private Color selMenuItem = Color.FromArgb(145, 201, 247);
+        private Color selMenuItem = Color.FromArgb(110, 0, 140, 255);
 
         public override Color ButtonSelectedGradientBegin
         {
