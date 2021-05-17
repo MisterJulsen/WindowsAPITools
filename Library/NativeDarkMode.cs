@@ -8,6 +8,14 @@ using System.Windows.Forms;
 
 namespace WinAPITools
 {
+    public enum PreferredAppMode
+    {
+        Light = 3,
+        Dark = 2,
+        SystemCurrent = 1,
+        Default = 0
+    }
+
     public class NativeDarkMode
     {
 
