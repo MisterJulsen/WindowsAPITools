@@ -33,6 +33,7 @@ namespace WinAPITools.Controls
 		private const int nMargin = 5;
 		private Color mBackColor = SystemColors.Control;
 		private Color borderColor = SystemColors.ControlDark;
+		private Color selLineColor = Color.Empty;
 
 		public FlatTabControl()
 		{
@@ -243,6 +244,12 @@ namespace WinAPITools.Controls
 				br = new SolidBrush(tabPage.BackColor);
 				g.FillPolygon(br, selectedPt);
 				g.DrawPolygon(new Pen(borderColor), selectedPt);
+				
+				if (selLineColor != Color.Empty)
+                {
+					if (this.Alignment == TabAlignment.Top) g.DrawLine(new Pen(selLineColor, 2), new Point(recBounds.Left + 3, recBounds.Top + 1), new Point(recBounds.Right - 2, recBounds.Top + 1));
+					else if (this.Alignment == TabAlignment.Bottom) g.DrawLine(new Pen(selLineColor, 2), new Point(recBounds.Left + 3, recBounds.Bottom), new Point(recBounds.Right - 2, recBounds.Bottom));
+				}
 			}
 			else
             {				
@@ -560,6 +567,13 @@ namespace WinAPITools.Controls
 		{
 			get { return borderColor; }
 			set { borderColor = value; this.Invalidate(); }
+		}
+
+		[Browsable(true)]
+		new public Color SelectionLineColor
+		{
+			get { return selLineColor; }
+			set { selLineColor = value; this.Invalidate(); }
 		}
 
 		#endregion
