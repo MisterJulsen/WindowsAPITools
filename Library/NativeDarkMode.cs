@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -23,7 +24,7 @@ namespace WinAPITools
         public static extern int SetWindowTheme(IntPtr hwnd, string pszSubAppName, string pszSubIdList);
 
         [DllImport("uxtheme.dll", EntryPoint = "#135")]
-        private static extern bool SetPreferredAppMode(bool allow); // 1903 or later
+        private static extern bool SetPreferredAppMode(PreferredAppMode mode); // 1903 or later
 
         [DllImport("uxtheme.dll", EntryPoint = "#133")]
         private static extern bool AllowDarkModeForApp(bool allow); // 1803
@@ -43,6 +44,7 @@ namespace WinAPITools
 
         /// <summary>
         /// Whether the windows 10 native dark theme for the window border should be applied or not.
+        /// IMPORTAND! YOU NEED TO HAVE A MANIFEST FILE WITH THE WINDOWS 10 SUPPORT ENTRY ENABLED!!!
         /// </summary>
         /// <param name="handle">The form's handle.</param>
         /// <param name="enabled"></param>
@@ -66,6 +68,7 @@ namespace WinAPITools
 
         /// <summary>
         /// Use the windows 10 native dark mode for MainMenu and ContextMenu control. Also the systemmenu and other context menus are supported. This method must be called before the first window is shown.
+        /// IMPORTAND! YOU NEED TO HAVE A MANIFEST FILE WITH THE WINDOWS 10 SUPPORT ENTRY ENABLED!!!
         /// </summary>
         /// <returns></returns>
         public static bool EnableDarkMode()
@@ -74,7 +77,7 @@ namespace WinAPITools
             {
                 if (IsWindows10OrGreater(18985))
                 {
-                    SetPreferredAppMode(true);
+                    SetPreferredAppMode(PreferredAppMode.Dark);
                 }
                 else
                 {
@@ -87,7 +90,28 @@ namespace WinAPITools
         }
 
         /// <summary>
+        /// Set which preferred app mode should be used. Only for Windows 10 build 1903 or greater.
+        /// IMPORTAND! YOU NEED TO HAVE A MANIFEST FILE WITH THE WINDOWS 10 SUPPORT ENTRY ENABLED!!!
+        /// </summary>
+        /// <param name="mode">The preferred app mode.</param>
+        /// <returns>true, if sucessfull</returns>
+        public static bool SetAppMode(PreferredAppMode mode)
+        {
+            if (IsWindows10OrGreater(17763))
+            {
+                if (IsWindows10OrGreater(18985))
+                {
+                    SetPreferredAppMode(mode);
+                    return true;
+                }
+            }
+            Console.WriteLine("The OS does not support these settings.");
+            return false;
+        }
+
+        /// <summary>
         /// Disables the windows 10 native dark mode.
+        /// IMPORTAND! YOU NEED TO HAVE A MANIFEST FILE WITH THE WINDOWS 10 SUPPORT ENTRY ENABLED!!!
         /// </summary>
         /// <returns></returns>
         public static bool DisableDarkMode()
@@ -96,7 +120,7 @@ namespace WinAPITools
             {
                 if (IsWindows10OrGreater(18985))
                 {
-                    SetPreferredAppMode(false);
+                    SetPreferredAppMode(PreferredAppMode.Default);
                 }
                 else
                 {
@@ -107,6 +131,27 @@ namespace WinAPITools
             Console.WriteLine("The OS does not support native dark mode.");
             return false;
         }
+
+        /// <summary>
+        /// Checks if the dark mode is enabled on this system.
+        /// IMPORTAND! YOU NEED TO HAVE A MANIFEST FILE WITH THE WINDOWS 10 SUPPORT ENTRY ENABLED!!!
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsSystemDarkModeEnabled()
+        {
+            return (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "AppsUseLightTheme", 1) == 0;
+        }
+
+        /// <summary>
+        /// Checks if the installed system supports native dark mode.
+        /// IMPORTAND! YOU NEED TO HAVE A MANIFEST FILE WITH THE WINDOWS 10 SUPPORT ENTRY ENABLED!!!
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsWin10DarkModeSupported()
+        {
+            return IsWindows10OrGreater(17763);
+        }
+
         private static bool IsWindows10OrGreater(int build = -1)
         {
             return Environment.OSVersion.Version.Major >= 10 && Environment.OSVersion.Version.Build >= build;
