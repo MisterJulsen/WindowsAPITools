@@ -79,6 +79,7 @@
     <Compile Include="DarkModeExtension.cs" />
     <Compile Include="DarkThemesStripRenderer.cs" />
     <Compile Include="DefaultCtrlData.cs" />
+    <Compile Include="FlashWindow.cs" />
     <Compile Include="LightThemesStripRenderer.cs" />
     <Compile Include="NativeDarkMode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
