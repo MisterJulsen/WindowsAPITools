@@ -8,14 +8,44 @@ using System.Windows.Forms;
 
 namespace WinAPITools.Controls
 {
-    public class ModernLinkLabel : Label
+    public class ModernLinkLabel : Control
     {
         private Color currentColor = Color.Black;
         private Font currentFont;
 
-        public ModernLinkLabel()
-        {
+        private const uint WM_SETCURSOR = 0x20;
+        private Cursor handCursor;
 
+        
+
+        public ModernLinkLabel()            
+        {
+            TabStop = true;
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.Selectable | ControlStyles.SupportsTransparentBackColor, true);
+        }
+
+        protected override void WndProc(ref Message msg)
+        {
+            if (msg.Msg == WM_SETCURSOR)
+            {
+                if (handCursor == null)
+                {
+                    // Fetch the real hand cursor from the system settings and cache it
+                    if (handCursor == null)
+                    {
+                        handCursor = CntrlTools.HandCursor;
+                    }
+                    // Use the system's hand cursor instead of .NET's internal hand cursor
+                    Cursor = handCursor;
+                }
+                else if (handCursor != null && Cursor != handCursor)
+                {
+                    // Forget the cached cursor
+                    handCursor.Dispose();
+                    handCursor = null;
+                }
+            }
+            base.WndProc(ref msg);
         }
 
         protected override void OnCreateControl()
@@ -24,6 +54,7 @@ namespace WinAPITools.Controls
             this.currentFont = Font;
             currentFont = new Font(Font, FontStyle.Regular);
             this.currentColor = Color.FromKnownColor(KnownColor.Highlight);
+            /*
             try
             {
                 Cursor = CntrlTools.HandCursor;
@@ -32,6 +63,8 @@ namespace WinAPITools.Controls
             {
                 Cursor = Cursors.Hand;
             }
+            */
+
             this.Refresh();
         }
 
@@ -39,6 +72,7 @@ namespace WinAPITools.Controls
         {
             string measureString = this.Text;
             TextRenderer.DrawText(e.Graphics, measureString, currentFont, new Point(0, 0), currentColor);
+            if (Focused) ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.Black, ButtonBorderStyle.Dashed);
         }
 
         protected override void OnMouseEnter(EventArgs e)
@@ -49,11 +83,35 @@ namespace WinAPITools.Controls
             this.Refresh();
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if (e.KeyCode == Keys.Enter)
+            {
+                base.OnClick(EventArgs.Empty);
+                e.Handled = e.SuppressKeyPress = true;
+            }
+        }
+
+        protected override void OnGotFocus(EventArgs e)
+        {
+            base.OnGotFocus(e);
+            Refresh();
+        }
+
+        protected override void OnLostFocus(EventArgs e)
+        {
+            base.OnLostFocus(e);
+            currentFont = new Font(Font, FontStyle.Regular);
+            this.Refresh();
+        }
+
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
             currentFont = new Font(Font, FontStyle.Regular);
             this.currentColor = Color.FromKnownColor(KnownColor.Highlight);
+            
             this.Refresh();
         }
 
@@ -68,9 +126,11 @@ namespace WinAPITools.Controls
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            currentFont = new Font(Font, FontStyle.Underline);
+            currentFont = new Font(Font, FontStyle.Regular);
             this.currentColor = Color.FromKnownColor(KnownColor.Highlight);
             this.Refresh();
         }
+
+
     }
 }
